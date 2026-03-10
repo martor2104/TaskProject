@@ -25,6 +25,10 @@ public class ProjectUserRole {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    public ProjectUserRole(){
+
+    }
+
     public ProjectUserRole(Long id, User user, Project project, Role role) {
         this.id = id;
         this.user = user;

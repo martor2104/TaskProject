@@ -4,6 +4,7 @@ import com.TaskProject.Entity.User;
 import com.TaskProject.auth.AuthResponse;
 import com.TaskProject.auth.LoginRequest;
 
+import com.TaskProject.auth.RegisterRequest;
 import com.TaskProject.jwt.JwtService;
 import com.TaskProject.repository.UserRepository;
 import com.TaskProject.service.AuthService;
@@ -32,35 +33,20 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        String token = jwtService.getToken(user);
-
-        return AuthResponse.builder()
-                .token(token)
-                .username(user.getUsername())
-                .role(user.getRole().name())
-                .build();
+        return new AuthResponse(jwtService.getToken(user));
     }
 
     @Override
-    public AuthResponse register(User userDetails, RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+    public AuthResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
         }
 
-        User newUser = User.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(userDetails.getRole())
-                .build();
+        User newUser = new User(request);
+        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(newUser);
 
-        String token = jwtService.generateToken(newUser);
-
-        return AuthResponse.builder()
-                .token(token)
-                .username(newUser.getUsername())
-                .role(newUser.getRole().name())
-                .build();
+        return new AuthResponse(jwtService.getToken(newUser));
     }
 }

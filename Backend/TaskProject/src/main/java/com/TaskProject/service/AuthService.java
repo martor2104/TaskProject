@@ -11,6 +11,6 @@ import org.springframework.stereotype.Service;
 public interface AuthService {
 
     AuthResponse login(LoginRequest request);
-    AuthResponse register(User userDetails, RegisterRequest request);
+    AuthResponse register(RegisterRequest request);
 
 }
