@@ -33,6 +33,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private Set<ProjectUserRole> projectRole;
 
+    public User(){
+
+    }
+
     public User(Long id, String username, String email, String password, SystemRole systemRole, Set<ProjectUserRole> projectRole) {
         this.id = id;
         this.username = username;
@@ -67,7 +71,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email; // ✅ usamos email como identificador único
+        return email;
     }
 
     @Override
