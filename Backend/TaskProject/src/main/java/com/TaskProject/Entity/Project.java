@@ -26,6 +26,8 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProjectUserRole> members = new HashSet<>();
 
+    public Project(){}
+
     public Project(Long id, String name, String description, Set<Task> tasks, Set<ProjectUserRole> members) {
         this.id = id;
         this.name = name;

@@ -11,7 +11,7 @@ import lombok.Getter;
 public class RegisterRequest {
 
     @NotBlank(message = "Username obligatorio")
-    private String username;
+    private String name;
 
     @NotBlank(message = "Email obligatorio")
     @Email(message = "Email inválido")
@@ -20,12 +20,10 @@ public class RegisterRequest {
     @NotBlank(message = "Password obligatoria")
     private String password;
 
-    private SystemRole systemRole;
-
     @Override
     public String toString() {
         return "RegisterRequest{" +
-                "username='" + username + '\'' +
+                "username='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 '}';

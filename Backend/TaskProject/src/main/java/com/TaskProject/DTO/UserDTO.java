@@ -12,15 +12,15 @@ import java.util.Set;
 public class UserDTO {
 
     private Long id;
-    private String username;
+    private String name;
     private String email;
     private String password;
     private SystemRole systemRole;
     private Set<ProjectUserRole> projectUserRole;
 
-    public UserDTO(Long id, String username, String email, String password, SystemRole systemRole, Set<ProjectUserRole> projectUserRole){
+    public UserDTO(Long id, String name, String email, String password, SystemRole systemRole, Set<ProjectUserRole> projectUserRole){
         this.id = id;
-        this.username = username;
+        this.name = name;
         this.email = email;
         this.password = password;
         this.systemRole = systemRole;
@@ -31,7 +31,7 @@ public class UserDTO {
     public String toString() {
         return "UserDTO{" +
                 "id=" + id +
-                ", username='" + username + '\'' +
+                ", username='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", systemRole='" + systemRole + '\'' +

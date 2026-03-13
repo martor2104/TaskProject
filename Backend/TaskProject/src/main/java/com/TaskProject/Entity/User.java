@@ -22,8 +22,8 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    
-    private String username;
+
+    private String name;
     private String email;
     private String password;
 
@@ -37,9 +37,9 @@ public class User implements UserDetails {
 
     }
 
-    public User(Long id, String username, String email, String password, SystemRole systemRole, Set<ProjectUserRole> projectRole) {
+    public User(Long id, String name, String email, String password, SystemRole systemRole, Set<ProjectUserRole> projectRole) {
         this.id = id;
-        this.username = username;
+        this.name = name;
         this.email = email;
         this.password = password;
         this.systemRole = systemRole;
@@ -47,16 +47,15 @@ public class User implements UserDetails {
     }
 
     public User(RegisterRequest request){
-        this.username = request.getUsername();
+        this.name = request.getName();
         this.email = request.getEmail();
         this.password = request.getPassword();
-        this.systemRole = request.getSystemRole() != null ? request.getSystemRole() : SystemRole.USER;
     }
 
     public static UserDTO toDTO(User user){
         return new UserDTO(
                 user.getId(),
-                user.getUsername(),
+                user.getName(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getSystemRole(),
@@ -69,7 +68,6 @@ public class User implements UserDetails {
         return List.of(new SimpleGrantedAuthority(systemRole.name()));
     }
 
-    @Override
     public String getUsername() {
         return email;
     }
@@ -95,7 +93,7 @@ public class User implements UserDetails {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", username='" + username + '\'' +
+                ", username='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", systemRole='" + systemRole + '\'' +

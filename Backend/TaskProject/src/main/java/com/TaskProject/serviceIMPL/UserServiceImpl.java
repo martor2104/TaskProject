@@ -1,6 +1,7 @@
 package com.TaskProject.serviceIMPL;
 
 import com.TaskProject.DTO.UserDTO;
+import com.TaskProject.Entity.SystemRole;
 import com.TaskProject.Entity.User;
 import com.TaskProject.repository.UserRepository;
 import com.TaskProject.service.UserService;
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
 
-        existing.setUsername(userDTO.getUsername());
+        existing.setName(userDTO.getName());
         existing.setEmail(userDTO.getEmail());
 
         if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank()) {
@@ -63,5 +64,20 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException("User not found with id: " + id);
         }
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDTO createUser(UserDTO userDTO, SystemRole systemRole) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        User newUser = new User();
+        newUser.setName(userDTO.getName());
+        newUser.setEmail(userDTO.getEmail());
+        newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        newUser.setSystemRole(systemRole);
+
+        return User.toDTO(userRepository.save(newUser));
     }
 }

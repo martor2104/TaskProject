@@ -1,5 +1,6 @@
 package com.TaskProject.serviceIMPL;
 
+import com.TaskProject.Entity.SystemRole;
 import com.TaskProject.Entity.User;
 import com.TaskProject.auth.AuthResponse;
 import com.TaskProject.auth.LoginRequest;
@@ -44,6 +45,7 @@ public class AuthServiceImpl implements AuthService {
 
         User newUser = new User(request);
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        newUser.setSystemRole(SystemRole.USER);
 
         userRepository.save(newUser);
 

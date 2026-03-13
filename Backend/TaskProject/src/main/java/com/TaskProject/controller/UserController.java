@@ -1,10 +1,12 @@
 package com.TaskProject.controller;
 
 import com.TaskProject.DTO.UserDTO;
+import com.TaskProject.Entity.SystemRole;
 import com.TaskProject.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +49,13 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping
+    @Operation(summary = "Crear usuario (solo ADMIN)")
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO,
+                                              @RequestParam SystemRole systemRole) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userDTO, systemRole));
     }
 
 }

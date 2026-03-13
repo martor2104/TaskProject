@@ -21,7 +21,7 @@ public class DataInitializer implements ApplicationRunner {
 
         if (userRepository.findByEmail("admin@admin.com").isEmpty()) {
             User admin = new User();
-            admin.setUsername("admin");
+            admin.setName("admin");
             admin.setEmail("admin@admin.com");
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setSystemRole(SystemRole.ADMIN);

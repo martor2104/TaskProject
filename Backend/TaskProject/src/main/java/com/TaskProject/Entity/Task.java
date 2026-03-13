@@ -35,6 +35,8 @@ public class Task {
     @JoinColumn(name = "user_id")
     private User assignedUser;
 
+    public Task(){}
+
     public Task(Long id, String title, String description, LocalDate date, Priority priority, Status status, Project project, User assignedUser) {
         this.id = id;
         this.title = title;
