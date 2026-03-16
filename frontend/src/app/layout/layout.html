@@ -1,0 +1,104 @@
+<div class="shell">
+
+    
+  <div class="sidebar">
+    <div class="logo">daily<span>gestor de tareas</span></div>
+ 
+    <div class="nav">
+      <div class="nav-section">vistas</div>
+      <button class="nav-item active" data-filter="all">
+        <div class="nav-dot" style="background: var(--text-primary)"></div>
+        Hoy
+        <span class="nav-badge" id="pending-badge">0</span>
+      </button>
+      <button class="nav-item" data-filter="pending">
+        <div class="nav-dot" style="background: #EF9F27"></div>
+        Pendientes
+      </button>
+      <button class="nav-item" data-filter="done">
+        <div class="nav-dot" style="background: #1D9E75"></div>
+        Completadas
+      </button>
+ 
+      <div class="nav-section" style="margin-top: 1.25rem">categorías</div>
+      <button class="nav-item" data-filter-tag="personal">
+        <div class="nav-dot" style="background: #7F77DD"></div>
+        Personal
+      </button>
+      <button class="nav-item" data-filter-tag="trabajo">
+        <div class="nav-dot" style="background: #378ADD"></div>
+        Trabajo
+      </button>
+      <button class="nav-item" data-filter-tag="hogar">
+        <div class="nav-dot" style="background: #EF9F27"></div>
+        Hogar
+      </button>
+      <button class="nav-item" data-filter-tag="salud">
+        <div class="nav-dot" style="background: #1D9E75"></div>
+        Salud
+      </button>
+    </div>
+ 
+    <div class="sidebar-footer">
+      <div class="avatar-row">
+        <div class="avatar">U</div>
+        <div>
+          <div class="avatar-name">Usuario</div>
+          <div class="avatar-sub" id="date-sb"></div>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()" title="Cerrar sesión">Salir</button>
+    </div>
+  </div>
+ 
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title">Buenos días, <em>¿qué toca hoy?</em></div>
+      <div class="topbar-right">
+        <button class="icon-btn" id="clear-done-btn" title="Limpiar completadas">✕</button>
+        <button class="add-task-btn" id="focus-add">+ Nueva tarea</button>
+      </div>
+    </div>
+ 
+    <div class="filters-row">
+      <button class="filter-chip active" data-chip="all">Todas</button>
+      <button class="filter-chip" data-chip="pending">Pendientes</button>
+      <button class="filter-chip" data-chip="done">Hechas</button>
+      <button class="filter-chip" data-chip="high">Alta prioridad</button>
+    </div>
+ 
+    <div class="tasks-scroll" id="tasks-scroll"></div>
+  </div>
+ 
+  <!-- DETAIL PANEL -->
+  <div class="detail">
+    <div class="detail-title">resumen del día</div>
+ 
+    <div class="progress-block">
+      <div class="prog-row">
+        <div class="prog-num" id="done-num">0</div>
+        <div class="prog-pct" id="done-pct">0%</div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div style="font-size: 12px; color: var(--text-secondary); font-weight: 300;" id="done-label">de 0 tareas completadas</div>
+    </div>
+ 
+    <div class="mini-stats">
+      <div class="stat-card"><div class="stat-val" id="stat-pending">0</div><div class="stat-lbl">pendientes</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-high">0</div><div class="stat-lbl">urgentes</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-streak">3</div><div class="stat-lbl">días racha</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">total hoy</div></div>
+    </div>
+ 
+    <div>
+      <div class="detail-title" style="margin-bottom: 10px">por categoría</div>
+      <div class="tag-list" id="tag-list"></div>
+    </div>
+ 
+    <div class="today-quote">
+      <div class="quote-text" id="quote-text"></div>
+    </div>
+  </div>
+ 
+</div>
