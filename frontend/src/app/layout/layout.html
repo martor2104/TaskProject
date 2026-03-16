@@ -1,104 +1,199 @@
 <div class="shell">
 
-    
-  <div class="sidebar">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
     <div class="logo">daily<span>gestor de tareas</span></div>
- 
-    <div class="nav">
+
+    <nav class="nav">
       <div class="nav-section">vistas</div>
-      <button class="nav-item active" data-filter="all">
-        <div class="nav-dot" style="background: var(--text-primary)"></div>
-        Hoy
-        <span class="nav-badge" id="pending-badge">0</span>
+
+      <button class="nav-item" [class.active]="isChipActive('all')" (click)="setFilter('all')">
+        <span class="nav-dot" style="background: #1a1a1a"></span>
+        Todas
+        <span class="nav-badge">{{ pendingBadge() }}</span>
       </button>
-      <button class="nav-item" data-filter="pending">
-        <div class="nav-dot" style="background: #EF9F27"></div>
+      <button class="nav-item" [class.active]="isChipActive('pending')" (click)="setFilter('pending')">
+        <span class="nav-dot" style="background: #EF9F27"></span>
         Pendientes
       </button>
-      <button class="nav-item" data-filter="done">
-        <div class="nav-dot" style="background: #1D9E75"></div>
+      <button class="nav-item" [class.active]="isChipActive('done')" (click)="setFilter('done')">
+        <span class="nav-dot" style="background: #1D9E75"></span>
         Completadas
       </button>
- 
-      <div class="nav-section" style="margin-top: 1.25rem">categorías</div>
-      <button class="nav-item" data-filter-tag="personal">
-        <div class="nav-dot" style="background: #7F77DD"></div>
-        Personal
+      <button class="nav-item" [class.active]="isChipActive('high')" (click)="setFilter('high')">
+        <span class="nav-dot" style="background: #E24B4A"></span>
+        Alta prioridad
       </button>
-      <button class="nav-item" data-filter-tag="trabajo">
-        <div class="nav-dot" style="background: #378ADD"></div>
-        Trabajo
-      </button>
-      <button class="nav-item" data-filter-tag="hogar">
-        <div class="nav-dot" style="background: #EF9F27"></div>
-        Hogar
-      </button>
-      <button class="nav-item" data-filter-tag="salud">
-        <div class="nav-dot" style="background: #1D9E75"></div>
-        Salud
-      </button>
-    </div>
- 
+
+      @if (projectStats().length) {
+        <div class="nav-section mt">proyectos</div>
+        @for (ps of projectStats(); track ps.name) {
+          <button class="nav-item">
+            <span class="nav-dot" [style.background]="ps.color"></span>
+            {{ ps.name }}
+          </button>
+        }
+      }
+    </nav>
+
     <div class="sidebar-footer">
       <div class="avatar-row">
-        <div class="avatar">U</div>
+        <div class="avatar">{{ userInitial() }}</div>
         <div>
-          <div class="avatar-name">Usuario</div>
-          <div class="avatar-sub" id="date-sb"></div>
+          <div class="avatar-name">{{ userEmail() }}</div>
+          <div class="avatar-sub">{{ dateStr }}</div>
         </div>
       </div>
-      <button class="logout-btn" (click)="logout()" title="Cerrar sesión">Salir</button>
     </div>
-  </div>
- 
+  </aside>
+
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
     <div class="topbar">
       <div class="page-title">Buenos días, <em>¿qué toca hoy?</em></div>
       <div class="topbar-right">
-        <button class="icon-btn" id="clear-done-btn" title="Limpiar completadas">✕</button>
-        <button class="add-task-btn" id="focus-add">+ Nueva tarea</button>
+        <button class="icon-btn" title="Limpiar completadas" (click)="clearDone()">✕</button>
+        <button class="add-task-btn" (click)="newTaskInput.focus()">+ Nueva tarea</button>
       </div>
     </div>
- 
+
     <div class="filters-row">
-      <button class="filter-chip active" data-chip="all">Todas</button>
-      <button class="filter-chip" data-chip="pending">Pendientes</button>
-      <button class="filter-chip" data-chip="done">Hechas</button>
-      <button class="filter-chip" data-chip="high">Alta prioridad</button>
+      @for (chip of [
+        { key: 'all',     label: 'Todas' },
+        { key: 'pending', label: 'Pendientes' },
+        { key: 'done',    label: 'Hechas' },
+        { key: 'high',    label: 'Alta prioridad' }
+      ]; track chip.key) {
+        <button class="filter-chip"
+                [class.active]="isChipActive(chip.key)"
+                (click)="setFilter(chip.key)">
+          {{ chip.label }}
+        </button>
+      }
     </div>
- 
-    <div class="tasks-scroll" id="tasks-scroll"></div>
-  </div>
- 
+
+    <div class="tasks-scroll">
+
+      @if (loading()) {
+        <div class="empty-state">Cargando tareas…</div>
+      } @else if (!filteredTasks().length) {
+        <div class="empty-state">Nada por aquí ✦</div>
+      }
+
+      @if (pendingFiltered().length) {
+        <div class="group-label">por hacer — {{ pendingFiltered().length }}</div>
+        @for (task of pendingFiltered(); track task.id; let i = $index) {
+          <div class="task-row" [style.animation-delay]="i * 0.04 + 's'"
+               (click)="toggleTask(task)">
+            <div class="cb">
+              <svg class="cb-tick" width="9" height="9" viewBox="0 0 9 9" fill="none">
+                <path d="M1.5 4.5l2 2L7.5 2" stroke="white" stroke-width="1.5"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="task-text">{{ task.title }}</div>
+            <div class="task-tag">{{ task.project.name }}</div>
+            <div class="task-due">{{ STATUS_MAP[task.status] }}</div>
+            <div class="prio-dot" [class]="'prio-' + priorityClass(task.priority)"></div>
+            <button class="del-btn" (click)="deleteTask(task.id, $event)">✕</button>
+          </div>
+        }
+      }
+
+      @if (doneFiltered().length) {
+        <div class="group-label mt-done">completadas — {{ doneFiltered().length }}</div>
+        @for (task of doneFiltered(); track task.id; let i = $index) {
+          <div class="task-row done" [style.animation-delay]="i * 0.04 + 's'"
+               (click)="toggleTask(task)">
+            <div class="cb">
+              <svg class="cb-tick" width="9" height="9" viewBox="0 0 9 9" fill="none">
+                <path d="M1.5 4.5l2 2L7.5 2" stroke="white" stroke-width="1.5"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="task-text">{{ task.title }}</div>
+            <div class="task-tag">{{ task.project.name }}</div>
+            <div class="task-due">{{ STATUS_MAP[task.status] }}</div>
+            <div class="prio-dot" [class]="'prio-' + priorityClass(task.priority)"></div>
+            <button class="del-btn" (click)="deleteTask(task.id, $event)">✕</button>
+          </div>
+        }
+      }
+
+      <div class="add-row">
+        <div class="add-plus">+</div>
+        <input #newTaskInput type="text"
+               placeholder="Nueva tarea… (Enter para añadir)"
+               [ngModel]="newTaskTitle()"
+               (ngModelChange)="newTaskTitle.set($event)"
+               (keydown)="addTask($event)"
+               autocomplete="off"/>
+        <div class="enter-hint">↵ enter</div>
+      </div>
+
+    </div>
+  </main>
+
   <!-- DETAIL PANEL -->
-  <div class="detail">
+  <aside class="detail">
     <div class="detail-title">resumen del día</div>
- 
+
     <div class="progress-block">
       <div class="prog-row">
-        <div class="prog-num" id="done-num">0</div>
-        <div class="prog-pct" id="done-pct">0%</div>
+        <div class="prog-num">{{ doneTasks() }}</div>
+        <div class="prog-pct">{{ progressPct() }}%</div>
       </div>
-      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
-      <div style="font-size: 12px; color: var(--text-secondary); font-weight: 300;" id="done-label">de 0 tareas completadas</div>
+      <div class="prog-track">
+        <div class="prog-fill" [style.width]="progressPct() + '%'"></div>
+      </div>
+      <div class="prog-sub">de {{ totalTasks() }} tareas completadas</div>
     </div>
- 
+
     <div class="mini-stats">
-      <div class="stat-card"><div class="stat-val" id="stat-pending">0</div><div class="stat-lbl">pendientes</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-high">0</div><div class="stat-lbl">urgentes</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-streak">3</div><div class="stat-lbl">días racha</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">total hoy</div></div>
+      <div class="stat-card">
+        <div class="stat-val">{{ pendingTasks() }}</div>
+        <div class="stat-lbl">pendientes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">{{ urgentTasks() }}</div>
+        <div class="stat-lbl">urgentes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">{{ totalTasks() }}</div>
+        <div class="stat-lbl">total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">{{ doneTasks() }}</div>
+        <div class="stat-lbl">hechas</div>
+      </div>
     </div>
- 
-    <div>
-      <div class="detail-title" style="margin-bottom: 10px">por categoría</div>
-      <div class="tag-list" id="tag-list"></div>
-    </div>
- 
+
+    @if (projectStats().length) {
+      <div>
+        <div class="detail-title mb">por proyecto</div>
+        <div class="tag-list">
+          @for (ps of projectStats(); track ps.name) {
+            <div class="tag-row">
+              <div class="tag-name" [style.color]="ps.color">{{ ps.name }}</div>
+              <div class="tag-bar-wrap">
+                <div class="tag-bar"
+                     [style.width]="ps.pct + '%'"
+                     [style.background]="ps.color"></div>
+              </div>
+              <div class="tag-count">{{ ps.count }}</div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
     <div class="today-quote">
-      <div class="quote-text" id="quote-text"></div>
+      <div class="quote-text">
+        @for (line of quoteLines(); track $index) {
+          {{ line }}<br>
+        }
+      </div>
     </div>
-  </div>
- 
+  </aside>
+
 </div>
